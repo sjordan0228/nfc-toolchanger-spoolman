@@ -21,7 +21,6 @@ gcode:
 ## Update Toolhead Macros
 
 Add `variable_spool_id: None` to each of your T0-T3 toolchange macros so Fluidd can display and assign spools per toolhead.
-The example below is from my madmax toolchanger setup. I edited the toolhead_X.cfg files
 
 Example for T0 (replicate for T1, T2, T3):
 
@@ -36,6 +35,51 @@ gcode:
     SET_ACTIVE_SPOOL ID={spool_id}
   {% endif %}
 ```
+
+## Persist Spool IDs Across Reboots
+
+By default, Klipper macro variables reset to `None` when Klipper restarts (e.g. after a power cut or reboot), meaning you'd have to rescan all your spools. To fix this, we use Klipper's `[save_variables]` system to save spool IDs to disk and restore them automatically on startup.
+
+**Step 1 — Check your `printer.cfg`**
+
+You likely already have this if you use the klipper-toolchanger offset saving:
+
+```ini
+[save_variables]
+filename: ~/printer_data/config/klipper-toolchanger/offset_save_file.cfg
+```
+
+If you don't have it, add it now. You only need one `[save_variables]` block — do not add a second one.
+
+**Step 2 — Add the startup restore macro**
+
+Add this to your `printer.cfg`. It runs automatically 1 second after Klipper starts and restores each toolhead's last known spool ID from disk:
+
+```ini
+[delayed_gcode RESTORE_SPOOL_IDS]
+initial_duration: 1
+gcode:
+  {% set svv = printer.save_variables.variables %}
+  # Restore T0 spool ID if previously saved
+  {% if svv.t0_spool_id is defined %}
+    SET_GCODE_VARIABLE MACRO=T0 VARIABLE=spool_id VALUE={svv.t0_spool_id}
+    SET_ACTIVE_SPOOL ID={svv.t0_spool_id}
+  {% endif %}
+  # Restore T1 spool ID if previously saved
+  {% if svv.t1_spool_id is defined %}
+    SET_GCODE_VARIABLE MACRO=T1 VARIABLE=spool_id VALUE={svv.t1_spool_id}
+  {% endif %}
+  # Restore T2 spool ID if previously saved
+  {% if svv.t2_spool_id is defined %}
+    SET_GCODE_VARIABLE MACRO=T2 VARIABLE=spool_id VALUE={svv.t2_spool_id}
+  {% endif %}
+  # Restore T3 spool ID if previously saved
+  {% if svv.t3_spool_id is defined %}
+    SET_GCODE_VARIABLE MACRO=T3 VARIABLE=spool_id VALUE={svv.t3_spool_id}
+  {% endif %}
+```
+
+The middleware automatically saves spool IDs to disk whenever an NFC scan occurs, so this restore macro will always have up-to-date values after a reboot.
 
 ## Restart Klipper
 

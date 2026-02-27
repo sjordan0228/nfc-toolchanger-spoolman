@@ -125,6 +125,19 @@ def set_active_spool(spool_id, toolhead):
         )
         response2.raise_for_status()
         logging.info(f"Updated {macro} spool_id variable to {spool_id}")
+
+        # Step 3: Persist the spool ID to disk using Klipper's save_variables system
+        # This ensures the spool ID survives Klipper restarts and power cuts.
+        # The RESTORE_SPOOL_IDS delayed_gcode macro reads these values on boot.
+        # Variable name: t0_spool_id, t1_spool_id, t2_spool_id, t3_spool_id
+        var_name = f"t{toolhead[-1]}_spool_id"
+        response3 = requests.post(
+            f"{MOONRAKER_URL}/printer/gcode/script",
+            json={"script": f"SAVE_VARIABLE VARIABLE={var_name} VALUE={spool_id}"},
+            timeout=5
+        )
+        response3.raise_for_status()
+        logging.info(f"Saved {var_name}={spool_id} to disk for persistence across reboots")
         return True
 
     except Exception as e:
