@@ -5,7 +5,7 @@
 # Example: ./push.sh "Updated middleware with persistent spool IDs"
 
 # Use provided commit message, or fall back to a default
-MESSAGE=${1:-"Update from Claude"}
+MESSAGE=${1:-"Update from Mac"}
 
 git add .
 git commit -m "$MESSAGE"
