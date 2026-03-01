@@ -11,7 +11,7 @@
 #   PN532 VCC  → ESP32-S3 3V3
 #   PN532 GND  → ESP32-S3 GND
 #   PN532 SDA  → ESP32-S3 GPIO1
-#   PN532 SCL  → ESP32-S3 GPIO0
+#   PN532 SCL  → ESP32-S3 GPIO2
 #
 # When an NFC tag is scanned, the UID is published to the MQTT
 # topic nfc/toolhead/T3 as JSON: {"uid": "XX-XX-XX", "toolhead": "T3"}
@@ -69,7 +69,7 @@ mqtt:
 # Slow frequency (10000 Hz) improves reliability with the PN532
 i2c:
   sda: GPIO1
-  scl: GPIO0
+  scl: GPIO2
   frequency: 10000
   scan: true  # Logs detected I2C devices on boot — useful for debugging
 
@@ -88,4 +88,4 @@ pn532_i2c:
       - mqtt.publish:
           topic: "nfc/toolhead/T3"
           payload: !lambda |-
-            return "{\"uid\": \"" + x + "\", \"toolhead\": \"T0\"}";
+            return "{\"uid\": \"" + x + "\", \"toolhead\": \"T3\"}";

@@ -1,7 +1,6 @@
 # Wiring Guide
 
 ## PN532 DIP Switch Settings (I2C Mode)
-## The DIP switch settings below were for my particular board. please verify your own
 
 Set the DIP switches on the PN532 board as follows:
 - Switch 1: **ON**
@@ -14,7 +13,7 @@ Set the DIP switches on the PN532 board as follows:
 | VCC       | 3V3          |
 | GND       | GND          |
 | SDA       | GPIO1        |
-| SCL       | GPIO0        |
+| SCL       | GPIO2        |
 
 > **Note:** The 3.3V pin on the ESP32-S3 DevKitC-1 is labeled **3V3**.
 > Do NOT connect VCC to 5V — the PN532 runs fine on 3.3V.
